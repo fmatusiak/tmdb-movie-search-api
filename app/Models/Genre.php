@@ -20,4 +20,22 @@ class Genre extends Model
     protected $translatable = [
         'name'
     ];
+
+    public function translate(array $languages): Genre
+    {
+        return self::translateForLanguages($this, $languages);
+    }
+
+    private function translateForLanguages(Genre $genre, array $languages): self
+    {
+        $translatedGenre = new self($genre->toArray());
+
+        if ($genre->id) {
+            $translatedGenre->id = $genre->id;
+        }
+
+        $translatedGenre->name = $genre->getTranslations('name', $languages);
+
+        return $translatedGenre;
+    }
 }

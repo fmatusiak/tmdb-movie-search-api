@@ -102,7 +102,7 @@ class TMDBFetchContent extends Command implements Isolatable
         $this->info("Fetched " . count($genresData) . " genres for '{$language}' language");
 
         foreach ($genresData as $genreData) {
-            $this->genreRepository->createOrUpdateGenreFromTMDBData($genreData, $language);
+            $this->genreRepository->createOrUpdateFromTMDBData($genreData, $language);
         }
     }
 

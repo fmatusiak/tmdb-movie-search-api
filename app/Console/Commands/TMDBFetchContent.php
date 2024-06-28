@@ -206,7 +206,7 @@ class TMDBFetchContent extends Command implements Isolatable
         try {
             $language = $apiLanguage->value;
 
-            $popularSeries = $this->serieService->fetchTopRatedFromTMDBApi($apiLanguage, $totalSeriesToFetch);
+            $popularSeries = $this->serieService->fetchTopRatedSeriesFromTMDBApi($apiLanguage, $totalSeriesToFetch);
 
             $this->info("Fetched " . count($popularSeries) . " series for '{$language}' language");
 

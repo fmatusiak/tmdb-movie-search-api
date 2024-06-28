@@ -23,7 +23,7 @@ class SerieService
      * @throws TMDBApiException
      * @throws Exception
      */
-    public function fetchTopRatedFromTMDBApi(TMDBApiLanguage $apiLanguage, int $totalMoviesToFetch = 50): array
+    public function fetchTopRatedSeriesFromTMDBApi(TMDBApiLanguage $apiLanguage, int $totalMoviesToFetch = 50): array
     {
         try {
             return $this->TMDBApiService->fetchContent('topRatedSeries', $apiLanguage, $totalMoviesToFetch);

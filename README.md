@@ -1,4 +1,4 @@
-## Pobieranie i zapisywanie danych z TMDB API  
+# Pobieranie i zapisywanie danych z TMDB API  
 
 Do korzystania z API TMDB wymagane jest dodanie klucza `TMDB_API_KEY`do konfiguracji (.env lub config/tmdb.php) 
 
@@ -40,7 +40,7 @@ API obsługuje następujące języki dla parametrów `language` i `api_language`
 
 #### Przykład
 ```sh
-"http://example.com/api/genres?perPage=10&columns=name,external_id&filters[name]=comedy&api_language=pl&language=en,pl"
+"https://example.com/api/genres?perPage=10&columns=name,external_id&filters[name]=comedy&api_language=pl&language=en,pl"
 ```
 ### `GET /api/genres/{genreId}` - zwraca gatunek
 
@@ -51,7 +51,7 @@ API obsługuje następujące języki dla parametrów `language` i `api_language`
 
 #### Przykład
 ```sh
-"http://example.com/api/genres/1?api_language=pl&language=en,pl"
+"https://example.com/api/genres/1?api_language=pl&language=en,pl"
 ```
 
 ## Filmy
@@ -79,7 +79,7 @@ API obsługuje następujące języki dla parametrów `language` i `api_language`
 #### Przykład
 
 ```sh
-"http://example.com/api/movies?perPage=10&columns=title,external_id&filters[title]=Inception&filters[genre_id]=1,2&filters[from_release_date]=01-01-2023&filters[to_release_date]=31-12-2024&api_language=pl&language=en,pl"
+"https://example.com/api/movies?perPage=10&columns=title,external_id&filters[title]=Inception&filters[genre_id]=1,2&filters[from_release_date]=01-01-2023&filters[to_release_date]=31-12-2024&api_language=pl&language=en,pl"
 ```
 ### `GET /api/movies/{movieId}` - zwraca film
 
@@ -90,7 +90,7 @@ API obsługuje następujące języki dla parametrów `language` i `api_language`
 
 #### Przykład
 ```sh
-"http://example.com/api/movies/1?api_language=pl&language=en,pl"
+"https://example.com/api/movies/1?api_language=pl&language=en,pl"
 ```
 ## Seriale
 
@@ -116,7 +116,7 @@ API obsługuje następujące języki dla parametrów `language` i `api_language`
 #### Przykład użycia
 
 ```sh
-"http://example.com/api/series?perPage=10&columns=title,external_id&filters[title]=Inception&filters[genre_id]=1,2&api_language=pl&language=en,pl"
+"https://example.com/api/series?perPage=10&columns=title,external_id&filters[title]=Inception&filters[genre_id]=1,2&api_language=pl&language=en,pl"
 ```
 ### `GET /api/series/{serieId}` - zwraca serial
 
@@ -127,5 +127,5 @@ API obsługuje następujące języki dla parametrów `language` i `api_language`
 
 #### Przykład
 ```sh
-"http://example.com/api/series/1?api_language=pl&language=en,pl"
+"https://example.com/api/series/1?api_language=pl&language=en,pl"
 ```

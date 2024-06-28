@@ -6,11 +6,11 @@ use App\Http\Requests\SerieIndexRequest;
 use App\Http\Requests\SerieShowRequest;
 use App\Repositories\SerieRepository;
 use App\StringParser;
-use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class SerieController extends Controller
 {
@@ -32,7 +32,7 @@ class SerieController extends Controller
             $paginate = $this->serieRepository->paginate($perPage, $filters, $columns, $languages);
 
             return response()->json($paginate);
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             Log::error('An unexpected error occurred while fetching series', ['error' => $e->getMessage(), 'exception' => $e]);
 
             return response()->json(['error' => Lang::get('messages.unexpected_error_get_series')], 500);
@@ -51,7 +51,7 @@ class SerieController extends Controller
             return response()->json(['data' => $translatedSerie]);
         } catch (ModelNotFoundException) {
             return response()->json(['error' => Lang::get('messages.serie_not_found')], 404);
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             Log::error('An unexpected error occurred while getting serie', ['error' => $e->getMessage(), 'exception' => $e]);
 
             return response()->json(['error' => Lang::get('messages.unexpected_error_get_serie')], 500);

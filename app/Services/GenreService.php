@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Exceptions\TMDBApiException;
 use App\TMDBApiLanguage;
-use Mockery\Exception;
+use Exception;
 
 class GenreService
 {
@@ -17,15 +17,10 @@ class GenreService
 
     /**
      * @throws TMDBApiException
+     * @throws Exception
      */
     public function fetchGenresFromTMDBApi(TMDBApiLanguage $apiLanguage): array
     {
-        try {
-            return $this->TMDBApiService->fetchGenres($apiLanguage);
-        } catch (TMDBApiException $e) {
-            throw new TMDBApiException('TMDB API error fetch genres', $e->getCode(), $e);
-        } catch (Exception $e) {
-            throw new Exception('An unexpected error occurred while fetch genres', $e->getCode(), $e);
-        }
+        return $this->TMDBApiService->fetchGenres($apiLanguage);
     }
 }

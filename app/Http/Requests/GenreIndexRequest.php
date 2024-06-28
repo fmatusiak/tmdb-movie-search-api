@@ -37,7 +37,7 @@ class GenreIndexRequest extends FormRequest
                         try {
                             TMDBApiLanguage::isValid($language);
                         } catch (TMDBApiLanguageNotSupportedException $e) {
-                            $fail("The selected language  is invalid.");
+                            $fail($e->getMessage());
                         }
                     }
                 },

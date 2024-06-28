@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\Genre;
+use Exception;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 
@@ -40,20 +41,32 @@ class GenreRepository extends Repository
         return $pagination;
     }
 
+    /**
+     * @throws Exception
+     */
     public function createOrUpdateFromTMDBData(array $genreData, string $language): Genre
     {
-        $genre = $this->firstOrCreate([
-            'external_id' => $genreData['id'],
-        ]);
+        try {
+            $genre = $this->firstOrCreate([
+                'external_id' => $genreData['id'],
+            ]);
 
-        $currentTranslation = $genre->getTranslation('name', $language, false);
+            $currentTranslation = $genre->getTranslation('name', $language, false);
 
-        if (!$currentTranslation || $currentTranslation !== $genreData['name']) {
-            $genre->setTranslation('name', $language, $genreData['name']);
+            if (!$currentTranslation || $currentTranslation !== $genreData['name']) {
+                $genre->setTranslation('name', $language, $genreData['name']);
 
-            $genre->save();
+                $genre->save();
+            }
+
+            return $genre;
+        } catch (Exception $e) {
+            throw new Exception('An error occurred while creating or updating genre from TMDB data', 0, $e);
         }
+    }
 
-        return $genre;
+    public function getGenreIdsByExternalIds(array $externalIds): array
+    {
+        return $this->model::whereIn('external_id', $externalIds)->pluck('id')->all();
     }
 }

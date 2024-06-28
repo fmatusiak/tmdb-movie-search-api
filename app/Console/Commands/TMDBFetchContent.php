@@ -11,6 +11,7 @@ use App\TMDBApiLanguage;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Console\Isolatable;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class TMDBFetchContent extends Command implements Isolatable
@@ -63,7 +64,11 @@ class TMDBFetchContent extends Command implements Isolatable
      */
     public function handle(): void
     {
+        $this->info("Starting to fetch content from TMDB");
+
         $this->fetchAndSaveContent();
+
+        $this->info("Finished fetching content from TMDB");
     }
 
     private function fetchAndSaveContent(): void
@@ -84,10 +89,16 @@ class TMDBFetchContent extends Command implements Isolatable
         try {
             $genresData = $this->genreService->fetchGenresFromTMDBApi($apiLanguage);
 
+            DB::beginTransaction();
+
             $this->saveGenres($genresData, $apiLanguage);
+
+            DB::commit();
         } catch (TMDBApiException $e) {
             $this->logError("TMDB API error for language '{$apiLanguage->value}': " . $e->getMessage(), $e);
         } catch (Exception $e) {
+            DB::rollBack();
+
             $this->logError("Error fetching and saving genres for language '$apiLanguage->value': " . $e->getMessage(), $e);
         }
     }
@@ -110,7 +121,7 @@ class TMDBFetchContent extends Command implements Isolatable
     {
         Log::error($errorMessage, ['exception' => $exception]);
 
-        $this->error($errorMessage);
+        $this->error($errorMessage . " - " . $exception->getPrevious()->getMessage());
     }
 
     private function fetchAndSaveTopRatedMovies(TMDBApiLanguage $apiLanguage, int $totalMoviesToFetch = 50): void
@@ -122,12 +133,20 @@ class TMDBFetchContent extends Command implements Isolatable
 
             $this->info("Fetched " . count($popularMovies) . " movies for '{$language}' language");
 
-            $this->saveTMDBContent($this->movieService, $popularMovies, $language);
+            DB::beginTransaction();
 
-            $this->fetchAndSaveTranslationsForTMDBContent($this->movieService, $popularMovies, $this->translateToLanguages);
+            $this->saveTMDBMoviesContent($popularMovies, $language);
+
+            $this->fetchAndSaveTranslationsForTMDBMovies($popularMovies, $this->translateToLanguages);
+
+            DB::commit();
         } catch (TMDBApiException $e) {
-            $this->logError("TMDB API error for language '{$language}'" . $e->getMessage(), $e);
+            DB::rollBack();
+
+            $this->logError("TMDB API error for language '{$language}': " . $e->getMessage(), $e);
         } catch (Exception $e) {
+            DB::rollBack();
+
             $this->logError("Error fetching and saving movies for language '$language': " . $e->getMessage(), $e);
         }
     }
@@ -135,14 +154,22 @@ class TMDBFetchContent extends Command implements Isolatable
     /**
      * @throws Exception
      */
-    private function saveTMDBContent(object $service, array $data, string $language): void
+    private function saveTMDBMoviesContent(array $TMDBMoviesData, string $language): void
+    {
+        $this->saveTMDBContent($this->movieService, $TMDBMoviesData, $language);
+    }
+
+    /**
+     * @throws Exception
+     */
+    private function saveTMDBContent(object $service, array $TMDBData, string $language): void
     {
         $chunkSize = 100;
-        $chunks = array_chunk($data, $chunkSize);
+        $chunks = array_chunk($TMDBData, $chunkSize);
 
         foreach ($chunks as $chunk) {
-            foreach ($chunk as $TMDBData) {
-                $service->createOrUpdateTMDB($TMDBData, $language);
+            foreach ($chunk as $data) {
+                $service->createOrUpdateTMDBData($data, $language);
             }
         }
     }
@@ -150,16 +177,24 @@ class TMDBFetchContent extends Command implements Isolatable
     /**
      * @throws Exception
      */
-    private function fetchAndSaveTranslationsForTMDBContent(object $service, array $data, array $translateToLanguages = []): void
+    private function fetchAndSaveTranslationsForTMDBMovies(array $TMDBData, array $translateToLanguages = []): void
+    {
+        $this->fetchAndSaveTranslationsForTMDBContent($this->movieService, $TMDBData, $translateToLanguages);
+    }
+
+    /**
+     * @throws Exception
+     */
+    private function fetchAndSaveTranslationsForTMDBContent(object $service, array $TMDBData, array $translateToLanguages = []): void
     {
         $chunkSize = 100;
-        $chunks = array_chunk($data, $chunkSize);
+        $chunks = array_chunk($TMDBData, $chunkSize);
 
         $this->info("Fetching translations");
 
         foreach ($chunks as $chunk) {
-            foreach ($chunk as $TMDBData) {
-                $service->fetchAndSaveTranslations($TMDBData, $translateToLanguages);
+            foreach ($chunk as $data) {
+                $service->fetchAndSaveTMDBTranslations($data, $translateToLanguages);
             }
         }
 
@@ -175,14 +210,38 @@ class TMDBFetchContent extends Command implements Isolatable
 
             $this->info("Fetched " . count($popularSeries) . " series for '{$language}' language");
 
-            $this->saveTMDBContent($this->serieService, $popularSeries, $language);
+            DB::beginTransaction();
 
-            $this->fetchAndSaveTranslationsForTMDBContent($this->serieService, $popularSeries, $this->translateToLanguages);
+            $this->saveTMDBSeriesContent($popularSeries, $language);
+
+            $this->fetchAndSaveTranslationsForTMDBSeries($popularSeries, $this->translateToLanguages);
+
+            DB::commit();
         } catch (TMDBApiException $e) {
+            DB::rollBack();
+
             $this->logError("TMDB API error for language '{$language}' : " . $e->getMessage(), $e);
         } catch (Exception $e) {
+            DB::rollBack();
+
             $this->logError("Error fetching and saving series for language '$language': " . $e->getMessage(), $e);
         }
+    }
+
+    /**
+     * @throws Exception
+     */
+    private function saveTMDBSeriesContent(array $TMDBSeriesData, string $language): void
+    {
+        $this->saveTMDBContent($this->serieService, $TMDBSeriesData, $language);
+    }
+
+    /**
+     * @throws Exception
+     */
+    private function fetchAndSaveTranslationsForTMDBSeries(array $TMDBData, array $translateToLanguages = []): void
+    {
+        $this->fetchAndSaveTranslationsForTMDBContent($this->serieService, $TMDBData, $translateToLanguages);
     }
 
 }

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Spatie\Translatable\HasTranslations;
 
 /**
@@ -37,4 +38,9 @@ class Movie extends Model
         'popularity' => 'float',
         'release_date' => 'date'
     ];
+
+    public function genres(): BelongsToMany
+    {
+        return $this->belongsToMany(Genre::class, 'genre_movie');
+    }
 }

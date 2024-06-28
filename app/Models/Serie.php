@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Spatie\Translatable\HasTranslations;
 
 /**
@@ -36,4 +37,10 @@ class Serie extends Model
         'vote_average' => 'float',
         'release_date' => 'date'
     ];
+
+    public function genres(): BelongsToMany
+    {
+        return $this->belongsToMany(Genre::class, 'genre_serie');
+    }
+
 }

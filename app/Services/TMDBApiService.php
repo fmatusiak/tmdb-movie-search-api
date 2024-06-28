@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Exceptions\TMDBApiException;
 use App\TMDBApiLanguage;
+use Exception;
 use Illuminate\Support\Arr;
 
 class TMDBApiService
@@ -17,6 +18,7 @@ class TMDBApiService
 
     /**
      * @throws TMDBApiException
+     * @throws Exception
      */
     public function fetchContent(string $apiMethod, TMDBApiLanguage $apiLanguage, int $totalToFetch = 50): array
     {
@@ -61,31 +63,47 @@ class TMDBApiService
 
     /**
      * @throws TMDBApiException
+     * @throws Exception
      */
     public function fetchGenres(TMDBApiLanguage $apiLanguage): array
     {
-        $this->TMDBApi->setLanguage($apiLanguage);
+        try {
+            $this->TMDBApi->setLanguage($apiLanguage);
 
-        $moviesGenres = Arr::get($this->TMDBApi->movieGenres(), 'genres');
-        $seriesGenres = Arr::get($this->TMDBApi->seriesGenres(), 'genres');
+            $moviesGenres = Arr::get($this->TMDBApi->movieGenres(), 'genres');
+            $seriesGenres = Arr::get($this->TMDBApi->seriesGenres(), 'genres');
 
-        return collect($moviesGenres)
-            ->merge($seriesGenres)
-            ->unique('id')
-            ->all();
+            return collect($moviesGenres)
+                ->merge($seriesGenres)
+                ->unique('id')
+                ->all();
+        } catch (TMDBApiException $e) {
+            throw new TMDBApiException('Error fetch genres', 0, $e);
+        } catch (Exception $e) {
+            throw new Exception('An unexpected error occurred while fetch genres', 0, $e);
+        }
     }
 
+    /**
+     * @throws Exception
+     */
     public function fetchTranslations(string $method, int $externalId, array $languages): array
     {
-        $translations = [];
+        try {
+            $translations = [];
 
-        foreach ($languages as $language) {
-            $this->TMDBApi->setLanguage($language);
-            $currentLanguage = $this->TMDBApi->getLanguage();
+            foreach ($languages as $language) {
+                $this->TMDBApi->setLanguage($language);
+                $currentLanguage = $this->TMDBApi->getLanguage();
 
-            $translations[$currentLanguage] = $this->TMDBApi->{$method}($externalId);
+                $translations[$currentLanguage] = $this->TMDBApi->{$method}($externalId);
+            }
+
+            return $translations;
+        } catch (TMDBApiException $e) {
+            throw new TMDBApiException('Error fetch translations', 0, $e);
+        } catch (Exception $e) {
+            throw new Exception('An unexpected error occurred while fetching translations', 0, $e);
         }
-
-        return $translations;
     }
 }

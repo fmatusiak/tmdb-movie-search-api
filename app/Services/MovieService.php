@@ -3,51 +3,57 @@
 namespace App\Services;
 
 use App\Exceptions\TMDBApiException;
+use App\Models\Movie;
 use App\Repositories\MovieRepository;
 use App\TMDBApiLanguage;
-use Mockery\Exception;
+use Exception;
 
-class MovieService extends TMDBContent
+class MovieService
 {
+    private MovieRepository $movieRepository;
     private TMDBApiService $TMDBApiService;
 
     public function __construct(TMDBApiService $TMDBApiService, MovieRepository $movieRepository)
     {
-        parent::__construct($movieRepository);
+        $this->movieRepository = $movieRepository;
         $this->TMDBApiService = $TMDBApiService;
     }
 
     /**
      * @throws TMDBApiException
+     * @throws Exception
      */
     public function fetchTopRatedMoviesFromTMDBApi(TMDBApiLanguage $apiLanguage, int $totalMoviesToFetch = 50): array
     {
         try {
             return $this->TMDBApiService->fetchContent('topRatedMovies', $apiLanguage, $totalMoviesToFetch);
         } catch (TMDBApiException $e) {
-            throw new TMDBApiException('TMDB API error fetch movies', $e->getCode(), $e);
+            throw new TMDBApiException('Error fetch top rated movies', 0, $e);
         } catch (Exception $e) {
-            throw new Exception('An unexpected error occurred while fetch movies', $e->getCode(), $e);
+            throw new Exception('An unexpected error occurred while fetch top rated movies', 0, $e);
         }
     }
 
-    public function createOrUpdateTMDBData(array $movieData, string $language): void
+    /**
+     * @throws Exception
+     */
+    public function createOrUpdateTMDBData(array $TMDBMovieData, string $language): Movie
     {
-        try {
-            $this->createOrUpdateTMDB($movieData, $language);
-        } catch (Exception $e) {
-            throw new Exception('An error occurred while creating or updating movie from TMDB data', $e->getCode(), $e);
-        }
+        return $this->movieRepository->createOrUpdateTMDBMovie($TMDBMovieData, $language);
     }
 
-    public function fetchAndSaveTranslations(array $movieData, array $languages): void
+    /**
+     * @throws Exception
+     */
+    public function fetchAndSaveTMDBTranslations(array $TMDBMovieData, array $languages): void
     {
         try {
-            $translations = $this->TMDBApiService->fetchTranslations('movieDetails', $movieData['id'], $languages);
-
-            $this->saveTranslations($movieData, $translations);
+            $translations = $this->TMDBApiService->fetchTranslations('movieDetails', $TMDBMovieData['id'], $languages);
+            $this->movieRepository->saveTMDBMovieTranslations($TMDBMovieData, $translations);
+        } catch (TMDBApiException $e) {
+            throw new TMDBApiException('Error fetch translations for movie', 0, $e);
         } catch (Exception $e) {
-            throw new Exception('An unexpected error occurred while fetch and save translations for movie', $e->getCode(), $e);
+            throw new Exception('An unexpected error occurred while fetching and saving TMDB movie translations', 0, $e);
         }
     }
 }

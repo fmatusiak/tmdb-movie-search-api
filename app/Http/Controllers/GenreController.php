@@ -37,7 +37,7 @@ class GenreController extends Controller
             return response()->json(['error' => 'An unexpected error occurred while get genres'], 500);
         }
     }
-    
+
     public function show(int $genreId, GenreShowRequest $request): JsonResponse
     {
         try {

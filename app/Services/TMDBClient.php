@@ -12,13 +12,24 @@ class TMDBClient
     private string $apiKey;
     private Client $client;
 
+    public function __construct(Client $client)
+    {
+        $this->client = $client;
+    }
+
     /**
      * @throws TMDBApiException
      */
-    public function __construct(Client $client)
+    public function prepareQueryParams(string $language, int $page = null): array
     {
-        $this->apiKey = $this->getApiKey();
-        $this->client = $client;
+        $queryParams['api_key'] = $this->getApiKey();
+        $queryParams['language'] = $language;
+
+        if ($page) {
+            $queryParams['page'] = $page;
+        }
+
+        return $queryParams;
     }
 
     /**
@@ -35,18 +46,6 @@ class TMDBClient
         return $apiKey;
     }
 
-    public function prepareQueryParams(string $language, int $page = null): array
-    {
-        $queryParams['api_key'] = $this->apiKey;
-        $queryParams['language'] = $language;
-
-        if ($page) {
-            $queryParams['page'] = $page;
-        }
-
-        return $queryParams;
-    }
-
     /**
      * @throws TMDBApiException
      */
@@ -61,12 +60,12 @@ class TMDBClient
             $responseData = json_decode($body, true);
 
             if (!$responseData && json_last_error() !== JSON_ERROR_NONE) {
-                throw new TMDBApiException('Failed to parse JSON response from TMDB API');
+                throw new TMDBApiException('Failed to parse JSON response');
             }
 
             return $responseData;
         } catch (GuzzleException $e) {
-            throw new TMDBApiException('Failed to get data from TMDB API', $e->getCode(), $e);
+            throw new TMDBApiException('TMDB API ERROR: ' . $e->getMessage(), 0, $e);
         }
     }
 }

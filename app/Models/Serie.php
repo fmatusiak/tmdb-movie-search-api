@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Spatie\Translatable\HasTranslations;
@@ -14,7 +13,6 @@ use Spatie\Translatable\HasTranslations;
  * @property float $vote_average
  * @property int $vote_count
  * @property float $popularity
- * @property Carbon release_date
  */
 class Serie extends Model
 {
@@ -30,12 +28,11 @@ class Serie extends Model
         'vote_average',
         'vote_count',
         'popularity',
-        'release_date'
     ];
 
     protected $casts = [
         'vote_average' => 'float',
-        'release_date' => 'date'
+        'popularity' => 'float',
     ];
 
     public function genres(): BelongsToMany
@@ -43,4 +40,31 @@ class Serie extends Model
         return $this->belongsToMany(Genre::class, 'genre_serie');
     }
 
+    public function translate(array $languages): Serie
+    {
+        return self::translateForLanguages($this, $languages);
+    }
+
+    private function translateForLanguages(Serie $serie, array $languages): self
+    {
+        $translatedSerie = new self($serie->toArray());
+
+        if ($serie->id) {
+            $translatedSerie->id = $serie->id;
+        }
+
+        if ($serie->title) {
+            $translatedSerie->title = $serie->getTranslations('title', $languages);
+        }
+
+        if ($serie->overview) {
+            $translatedSerie->overview = $serie->getTranslations('overview', $languages);
+        }
+
+        $translatedSerie->genres = $serie->genres->map(function ($genre) use ($languages) {
+            return $genre->translate($languages);
+        });
+
+        return $translatedSerie;
+    }
 }

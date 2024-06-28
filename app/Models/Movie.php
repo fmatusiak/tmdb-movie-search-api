@@ -2,19 +2,18 @@
 
 namespace App\Models;
 
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Spatie\Translatable\HasTranslations;
 
 /**
  * @property int $external_id
- * @property string $title
- * @property string $overview
+ * @property array $title
+ * @property array $overview
  * @property float $vote_average
  * @property int $vote_count
  * @property float $popularity
- * @property Carbon release_date
+ * @property string release_date
  */
 class Movie extends Model
 {

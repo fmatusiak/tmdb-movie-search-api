@@ -19,7 +19,6 @@ return new class extends Migration
             $table->decimal('vote_average',5,3)->default(0)->index();
             $table->integer('vote_count')->default(0)->index();
             $table->decimal('popularity',8,3)->default(0)->index();
-            $table->date('release_date')->nullable();
             $table->timestamps();
         });
     }

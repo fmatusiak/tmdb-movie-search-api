@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Models\Serie;
 use Exception;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 
@@ -15,6 +16,67 @@ class SerieRepository extends Repository
     {
         parent::__construct($serie);
         $this->genreRepository = $genreRepository;
+    }
+
+    public function paginate(int $perPage = 15, array $filters = [], array $columns = ['*'], array $languages = []): LengthAwarePaginator
+    {
+        $query = $this->model::query();
+
+        if ($title = Arr::get($filters, 'title')) {
+            $query = $query->where(function ($query) use ($title, $languages) {
+                foreach ($languages as $language) {
+                    $query->orWhereRaw("JSON_UNQUOTE(JSON_EXTRACT(title, '$.{$language}')) LIKE ?", ["%{$title}%"]);
+                }
+            });
+        }
+
+        if ($externalIds = Arr::get($filters, 'external_id')) {
+            $externalIds = explode(',', $externalIds);
+
+            $query = $query->whereIn('external_id', $externalIds);
+        }
+
+        if ($genreIds = Arr::get($filters, 'genre_id')) {
+            $genreIds = explode(',', $genreIds);
+
+            $query = $query->whereHas('genres', function ($query) use ($genreIds) {
+                $query->whereIn('genres.id', $genreIds);
+            });
+        }
+
+        if ($fromVoteAverage = Arr::get($filters, 'from_vote_average')) {
+            $query = $query->where('vote_average', '>=', $fromVoteAverage);
+        }
+
+        if ($toVoteAverage = Arr::get($filters, 'to_vote_average')) {
+            $query = $query->where('vote_average', '<=', $toVoteAverage);
+        }
+
+        if ($fromVoteCount = Arr::get($filters, 'from_vote_count')) {
+            $query = $query->where('vote_count', '>=', $fromVoteCount);
+        }
+
+        if ($toVoteCount = Arr::get($filters, 'to_vote_count')) {
+            $query = $query->where('vote_count', '<=', $toVoteCount);
+        }
+
+        if ($fromPopularity = Arr::get($filters, 'from_popularity')) {
+            $query = $query->where('popularity', '>=', $fromPopularity);
+        }
+
+        if ($toPopularity = Arr::get($filters, 'to_popularity')) {
+            $query = $query->where('popularity', '<=', $toPopularity);
+        }
+
+        $pagination = $query->paginate($perPage, $columns);
+
+        $items = $pagination->getCollection()->map(function ($serie) use ($languages) {
+            return $serie->translate($languages);
+        });
+
+        $pagination->setCollection($items);
+
+        return $pagination;
     }
 
     /**
@@ -32,9 +94,8 @@ class SerieRepository extends Repository
             $serie->vote_average = Arr::get($TMDBSerieData, 'vote_average', 0);
             $serie->vote_count = Arr::get($TMDBSerieData, 'vote_count', 0);
             $serie->popularity = Arr::get($TMDBSerieData, 'popularity', 0);
-            $serie->release_date = Arr::get($TMDBSerieData, 'release_date');
 
-            if ($name = Arr::get($TMDBSerieData, 'title')) {
+            if ($name = Arr::get($TMDBSerieData, 'name')) {
                 $serie->setTranslation('title', $defaultLanguage, $name);
             }
 
@@ -74,8 +135,8 @@ class SerieRepository extends Repository
             }
 
             foreach ($translations as $language => $value) {
-                if ($title = Arr::get($value, 'title')) {
-                    $serie->setTranslation('title', $language, $title);
+                if ($name = Arr::get($value, 'name')) {
+                    $serie->setTranslation('title', $language, $name);
                 }
 
                 if ($overview = Arr::get($value, 'overview')) {

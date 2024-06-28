@@ -3,7 +3,9 @@
 namespace App\Repositories;
 
 use App\Models\Movie;
+use Carbon\Carbon;
 use Exception;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 
@@ -16,6 +18,79 @@ class MovieRepository extends Repository
         parent::__construct($movie);
 
         $this->genreRepository = $genreRepository;
+    }
+
+    public function paginate(int $perPage = 15, array $filters = [], array $columns = ['*'], array $languages = []): LengthAwarePaginator
+    {
+        $query = $this->model::query();
+
+        if ($title = Arr::get($filters, 'title')) {
+            $query = $query->where(function ($query) use ($title, $languages) {
+                foreach ($languages as $language) {
+                    $query->orWhereRaw("JSON_UNQUOTE(JSON_EXTRACT(title, '$.{$language}')) LIKE ?", ["%{$title}%"]);
+                }
+            });
+        }
+
+        if ($externalIds = Arr::get($filters, 'external_id')) {
+            $externalIds = explode(',', $externalIds);
+
+            $query = $query->whereIn('external_id', $externalIds);
+        }
+
+        if ($genreIds = Arr::get($filters, 'genre_id')) {
+            $genreIds = explode(',', $genreIds);
+
+            $query = $query->whereHas('genres', function ($query) use ($genreIds) {
+                $query->whereIn('genres.id', $genreIds);
+            });
+        }
+
+        if ($fromVoteAverage = Arr::get($filters, 'from_vote_average')) {
+            $query = $query->where('vote_average', '>=', $fromVoteAverage);
+        }
+
+        if ($toVoteAverage = Arr::get($filters, 'to_vote_average')) {
+            $query = $query->where('vote_average', '<=', $toVoteAverage);
+        }
+
+        if ($fromVoteCount = Arr::get($filters, 'from_vote_count')) {
+            $query = $query->where('vote_count', '>=', $fromVoteCount);
+        }
+
+        if ($toVoteCount = Arr::get($filters, 'to_vote_count')) {
+            $query = $query->where('vote_count', '<=', $toVoteCount);
+        }
+
+        if ($fromPopularity = Arr::get($filters, 'from_popularity')) {
+            $query = $query->where('popularity', '>=', $fromPopularity);
+        }
+
+        if ($toPopularity = Arr::get($filters, 'to_popularity')) {
+            $query = $query->where('popularity', '<=', $toPopularity);
+        }
+
+        if ($fromReleaseDate = Arr::get($filters, 'from_release_date')) {
+            $fromReleaseDate = Carbon::parse($fromReleaseDate)->format('Y-m-d');
+
+            $query = $query->whereDate('release_date', '>=', $fromReleaseDate);
+        }
+
+        if ($toReleaseDate = Arr::get($filters, 'to_release_date')) {
+            $toReleaseDate = Carbon::parse($toReleaseDate)->format('Y-m-d');
+
+            $query = $query->whereDate('release_date', '<=', $toReleaseDate);
+        }
+
+        $pagination = $query->paginate($perPage, $columns);
+
+        $items = $pagination->getCollection()->map(function ($movie) use ($languages) {
+            return $movie->translate($languages);
+        });
+
+        $pagination->setCollection($items);
+
+        return $pagination;
     }
 
     /**

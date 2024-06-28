@@ -36,11 +36,39 @@ class Movie extends Model
     protected $casts = [
         'vote_average' => 'float',
         'popularity' => 'float',
-        'release_date' => 'date'
     ];
 
     public function genres(): BelongsToMany
     {
         return $this->belongsToMany(Genre::class, 'genre_movie');
     }
+
+    public function translate(array $languages): Movie
+    {
+        return self::translateForLanguages($this, $languages);
+    }
+
+    private function translateForLanguages(Movie $movie, array $languages): self
+    {
+        $translatedMovie = new self($movie->toArray());
+
+        if ($movie->id) {
+            $translatedMovie->id = $movie->id;
+        }
+
+        if ($movie->title) {
+            $translatedMovie->title = $movie->getTranslations('title', $languages);
+        }
+
+        if ($movie->overview) {
+            $translatedMovie->overview = $movie->getTranslations('overview', $languages);
+        }
+
+        $translatedMovie->genres = $movie->genres->map(function ($genre) use ($languages) {
+            return $genre->translate($languages);
+        });
+
+        return $translatedMovie;
+    }
+
 }

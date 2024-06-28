@@ -13,7 +13,7 @@ enum TMDBApiLanguage: string
     public static function isValid(string $language): void
     {
         if (!TMDBApiLanguage::tryFrom($language)) {
-            throw new TMDBApiLanguageNotSupportedException("Language '{$language}' not supported for TMDB API");
+            throw new TMDBApiLanguageNotSupportedException("Language '{$language}' not supported");
         }
     }
 }

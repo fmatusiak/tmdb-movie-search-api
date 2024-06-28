@@ -2,8 +2,7 @@
 
 namespace App\Http\Requests;
 
-use App\Exceptions\TMDBApiLanguageNotSupportedException;
-use App\TMDBApiLanguage;
+use App\LanguageHelper;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -25,17 +24,19 @@ class MovieShowRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'api_language' => [
+                'string',
+                function ($attribute, $value, $fail) {
+                    LanguageHelper::validateLanguage($value, $fail);
+                },
+            ],
             'language' => [
                 'string',
                 function ($attribute, $value, $fail) {
                     $languages = explode(',', $value);
 
                     foreach ($languages as $language) {
-                        try {
-                            TMDBApiLanguage::isValid($language);
-                        } catch (TMDBApiLanguageNotSupportedException $e) {
-                            $fail($e->getMessage());
-                        }
+                        LanguageHelper::validateLanguage($language, $fail);
                     }
                 },
             ],

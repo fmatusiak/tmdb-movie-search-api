@@ -6,10 +6,11 @@ use App\Http\Requests\MovieIndexRequest;
 use App\Http\Requests\MovieShowRequest;
 use App\Repositories\MovieRepository;
 use App\StringParser;
-use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class MovieController extends Controller
 {
@@ -31,10 +32,10 @@ class MovieController extends Controller
             $paginate = $this->movieRepository->paginate($perPage, $filters, $columns, $languages);
 
             return response()->json($paginate);
-        } catch (Exception $e) {
-            Log::error('An unexpected error occurred while get movies', ['error' => $e->getMessage(), 'exception' => $e]);
+        } catch (Throwable $e) {
+            Log::error('An unexpected error occurred while getting movies', ['error' => $e->getMessage(), 'exception' => $e]);
 
-            return response()->json(['error' => 'An unexpected error occurred while get movies'], 500);
+            return response()->json(['error' => Lang::get('messages.unexpected_error_get_movies')], 500);
         }
     }
 
@@ -49,11 +50,11 @@ class MovieController extends Controller
 
             return response()->json(['data' => $translatedMovie]);
         } catch (ModelNotFoundException) {
-            return response()->json(['error' => 'Movie not found'], 404);
-        } catch (Exception $e) {
-            Log::error('An unexpected error occurred while get movie', ['error' => $e->getMessage(), 'exception' => $e]);
+            return response()->json(['error' => Lang::get('messages.movie_not_found')], 404);
+        } catch (Throwable $e) {
+            Log::error('An unexpected error occurred while getting the movie', ['error' => $e->getMessage(), 'exception' => $e]);
 
-            return response()->json(['error' => 'An unexpected error occurred while get movie'], 500);
+            return response()->json(['error' => Lang::get('messages.unexpected_error_get_movie')], 500);
         }
     }
 }

@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Exceptions\TMDBApiLanguageNotSupportedException;
+use Illuminate\Support\Facades\Lang;
 
 enum TMDBApiLanguage: string
 {
@@ -13,7 +14,7 @@ enum TMDBApiLanguage: string
     public static function isValid(string $language): void
     {
         if (!TMDBApiLanguage::tryFrom($language)) {
-            throw new TMDBApiLanguageNotSupportedException("Language '{$language}' not supported");
+            throw new TMDBApiLanguageNotSupportedException(Lang::get('messages.language_not_supported', ['language' => $language]));
         }
     }
 }

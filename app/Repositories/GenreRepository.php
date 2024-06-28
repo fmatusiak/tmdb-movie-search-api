@@ -27,7 +27,9 @@ class GenreRepository extends Repository
         }
 
         if ($externalId = Arr::get($filters, 'external_id')) {
-            $query = $query->where('external_id', $externalId);
+            $externalIds = explode(',', $externalId);
+
+            $query = $query->where('external_id', $externalIds);
         }
 
         $pagination = $query->paginate($perPage, $columns);

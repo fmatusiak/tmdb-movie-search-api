@@ -2,8 +2,7 @@
 
 namespace App\Http\Requests;
 
-use App\Exceptions\TMDBApiLanguageNotSupportedException;
-use App\TMDBApiLanguage;
+use App\LanguageHelper;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -26,19 +25,23 @@ class GenreIndexRequest extends FormRequest
     {
         return [
             'perPage' => 'integer|min:1',
-            'columns' => 'array',
+            'column' => 'string',
             'filters' => 'array',
+            'filters.name' => 'string',
+            'filters.external_id' => 'string',
+            'api_language' => [
+                'string',
+                function ($attribute, $value, $fail) {
+                    LanguageHelper::validateLanguage($value, $fail);
+                },
+            ],
             'language' => [
                 'string',
                 function ($attribute, $value, $fail) {
                     $languages = explode(',', $value);
 
                     foreach ($languages as $language) {
-                        try {
-                            TMDBApiLanguage::isValid($language);
-                        } catch (TMDBApiLanguageNotSupportedException $e) {
-                            $fail($e->getMessage());
-                        }
+                        LanguageHelper::validateLanguage($language, $fail);
                     }
                 },
             ],

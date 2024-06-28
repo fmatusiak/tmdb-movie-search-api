@@ -9,6 +9,7 @@ use App\StringParser;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Log;
 
 class SerieController extends Controller
@@ -19,7 +20,7 @@ class SerieController extends Controller
     {
         $this->serieRepository = $serieRepository;
     }
-    
+
     public function index(SerieIndexRequest $request): JsonResponse
     {
         try {
@@ -32,9 +33,9 @@ class SerieController extends Controller
 
             return response()->json($paginate);
         } catch (Exception $e) {
-            Log::error('An unexpected error occurred while get series', ['error' => $e->getMessage(), 'exception' => $e]);
+            Log::error('An unexpected error occurred while fetching series', ['error' => $e->getMessage(), 'exception' => $e]);
 
-            return response()->json(['error' => 'An unexpected error occurred while get series'], 500);
+            return response()->json(['error' => Lang::get('messages.unexpected_error_get_series')], 500);
         }
     }
 
@@ -49,11 +50,11 @@ class SerieController extends Controller
 
             return response()->json(['data' => $translatedSerie]);
         } catch (ModelNotFoundException) {
-            return response()->json(['error' => 'Serie not found'], 404);
+            return response()->json(['error' => Lang::get('messages.serie_not_found')], 404);
         } catch (Exception $e) {
-            Log::error('An unexpected error occurred while get serie', ['error' => $e->getMessage(), 'exception' => $e]);
+            Log::error('An unexpected error occurred while getting serie', ['error' => $e->getMessage(), 'exception' => $e]);
 
-            return response()->json(['error' => 'An unexpected error occurred while get serie'], 500);
+            return response()->json(['error' => Lang::get('messages.unexpected_error_get_serie')], 500);
         }
     }
 

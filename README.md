@@ -1,5 +1,3 @@
-
-# Dokumentacja
 ## Pobieranie i zapisywanie danych z TMDB API  
 
 Do korzystania z API TMDB wymagane jest dodanie klucza `TMDB_API_KEY`do konfiguracji (.env lub config/tmdb.php) 
@@ -10,7 +8,7 @@ Komenda `tmdb:fetch-content` służy do pobierania i zapisywania danych z TMDB A
 - `--movies=` (opcjonalny): Określa liczbę filmów do pobrania. Domyślnie ustawione na 50.
 - `--series=` (opcjonalny): Określa liczbę seriali do pobrania. Domyślnie ustawione na 10.
 
-### Przykład użycia
+### Przykład
 
 ```sh
 php artisan tmdb:fetch-content --movies=50 --series=10
@@ -18,7 +16,7 @@ php artisan tmdb:fetch-content --movies=50 --series=10
 
 # Endpointy
 
-### Obsługiwane języki
+#### Obsługiwane języki
 
 API obsługuje następujące języki dla parametrów `language` i `api_language`:
 
@@ -28,7 +26,7 @@ API obsługuje następujące języki dla parametrów `language` i `api_language`
 
 ## Gatunki
 
-### `GET /genres` - zwraca gatunki
+### `GET /api/genres` - zwraca gatunki
 
 #### Parametry
 
@@ -44,7 +42,7 @@ API obsługuje następujące języki dla parametrów `language` i `api_language`
 ```sh
 "http://example.com/api/genres?perPage=10&columns=name,external_id&filters[name]=comedy&api_language=pl&language=en,pl"
 ```
-### `GET /genres/{genreId}` - zwraca gatunek
+### `GET /api/genres/{genreId}` - zwraca gatunek
 
 #### Parametry
 
@@ -57,7 +55,7 @@ API obsługuje następujące języki dla parametrów `language` i `api_language`
 ```
 
 ## Filmy
-### `GET /movies` - zwraca filmy
+### `GET /api/movies` - zwraca filmy
 
 #### Parametry
 
@@ -83,7 +81,7 @@ API obsługuje następujące języki dla parametrów `language` i `api_language`
 ```sh
 "http://example.com/api/movies?perPage=10&columns=title,external_id&filters[title]=Inception&filters[genre_id]=1,2&filters[from_release_date]=01-01-2023&filters[to_release_date]=31-12-2024&api_language=pl&language=en,pl"
 ```
-### `GET /movies/{movieId}` - zwraca film
+### `GET /api/movies/{movieId}` - zwraca film
 
 #### Parametry
 
@@ -96,7 +94,7 @@ API obsługuje następujące języki dla parametrów `language` i `api_language`
 ```
 ## Seriale
 
-### `GET /series` - zwraca seriale
+### `GET /api/series` - zwraca seriale
 
 #### Parametry
 
@@ -120,7 +118,7 @@ API obsługuje następujące języki dla parametrów `language` i `api_language`
 ```sh
 "http://example.com/api/series?perPage=10&columns=title,external_id&filters[title]=Inception&filters[genre_id]=1,2&api_language=pl&language=en,pl"
 ```
-### `GET /series/{serieId}` - zwraca serial
+### `GET /api/series/{serieId}` - zwraca serial
 
 #### Parametry
 

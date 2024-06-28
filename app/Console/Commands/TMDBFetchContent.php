@@ -164,13 +164,8 @@ class TMDBFetchContent extends Command implements Isolatable
      */
     private function saveTMDBContent(object $service, array $TMDBData, string $language): void
     {
-        $chunkSize = 100;
-        $chunks = array_chunk($TMDBData, $chunkSize);
-
-        foreach ($chunks as $chunk) {
-            foreach ($chunk as $data) {
-                $service->createOrUpdateTMDBData($data, $language);
-            }
+        foreach ($TMDBData as $data) {
+            $service->createOrUpdateTMDBData($data, $language);
         }
     }
 
@@ -187,15 +182,10 @@ class TMDBFetchContent extends Command implements Isolatable
      */
     private function fetchAndSaveTranslationsForTMDBContent(object $service, array $TMDBData, array $translateToLanguages = []): void
     {
-        $chunkSize = 100;
-        $chunks = array_chunk($TMDBData, $chunkSize);
-
         $this->info("Fetching translations");
 
-        foreach ($chunks as $chunk) {
-            foreach ($chunk as $data) {
-                $service->fetchAndSaveTMDBTranslations($data, $translateToLanguages);
-            }
+        foreach ($TMDBData as $data) {
+            $service->fetchAndSaveTMDBTranslations($data, $translateToLanguages);
         }
 
         $this->info("Fetched translations");

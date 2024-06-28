@@ -8,8 +8,8 @@ use Spatie\Translatable\HasTranslations;
 
 /**
  * @property int $external_id
- * @property string $title
- * @property string $overview
+ * @property array $title
+ * @property array $overview
  * @property float $vote_average
  * @property int $vote_count
  * @property float $popularity

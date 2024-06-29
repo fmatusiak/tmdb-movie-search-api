@@ -25,6 +25,7 @@ class MovieIndexRequest extends FormRequest
     {
         return [
             'perPage' => 'integer|min:1',
+            'page' => 'integer|min:1',
             'column' => 'string',
             'filters' => 'array',
             'filters.title' => 'string',

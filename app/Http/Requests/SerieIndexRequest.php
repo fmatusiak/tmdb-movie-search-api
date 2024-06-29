@@ -23,9 +23,14 @@ class SerieIndexRequest extends FormRequest
      */
     public function rules(): array
     {
+        $availableSortColumns = ['id', 'title', 'external_id', 'vote_average', 'vote_count', 'popularity'];
+        $availableSortDirections = ['asc', 'desc'];
+
         return [
             'perPage' => 'integer|min:1',
             'page' => 'integer|min:1',
+            'sortBy' => 'string|in:' . implode(',', $availableSortColumns),
+            'sortDirection' => 'string|in:' . implode(',', $availableSortDirections),
             'column' => 'string',
             'filters' => 'array',
             'filters.title' => 'string',

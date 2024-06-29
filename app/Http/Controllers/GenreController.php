@@ -28,8 +28,10 @@ class GenreController extends Controller
             $columns = StringParser::parseStringToArray($request->input('column', ['*']));
             $filters = $request->input('filters', []);
             $languages = StringParser::parseStringToArray($request->input('language', [app()->getLocale()]));
+            $sortBy = $request->input('sortBy', 'name');
+            $sortDirection = $request->input('sortDirection', 'asc');
 
-            $paginate = $this->genreRepository->paginate($perPage, $filters, $columns, $languages);
+            $paginate = $this->genreRepository->paginate($perPage, $filters, $columns, $languages, $sortBy, $sortDirection);
 
             return response()->json($paginate);
         } catch (Throwable $e) {

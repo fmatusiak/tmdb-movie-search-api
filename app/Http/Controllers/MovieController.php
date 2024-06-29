@@ -28,8 +28,10 @@ class MovieController extends Controller
             $columns = StringParser::parseStringToArray($request->input('column', ['*']));
             $filters = $request->input('filters', []);
             $languages = StringParser::parseStringToArray($request->input('language', [app()->getLocale()]));
+            $sortBy = $request->input('sortBy', 'title');
+            $sortDirection = $request->input('sortDirection', 'asc');
 
-            $paginate = $this->movieRepository->paginate($perPage, $filters, $columns, $languages);
+            $paginate = $this->movieRepository->paginate($perPage, $filters, $columns, $languages, $sortBy, $sortDirection);
 
             return response()->json($paginate);
         } catch (Throwable $e) {

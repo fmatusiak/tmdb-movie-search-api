@@ -32,7 +32,9 @@ API obsługuje następujące języki dla parametrów `language` i `api_language`
 
 - `perPage` (opcjonalny): Liczba wyników na stronę. Musi być liczbą i większą od 0.
 - `page` (opcjonalny): Numer strony. Musi być liczbą i większą od 0.
-- `column` (opcjonalny): Kolumny do zwrócenia. Musi być ciągiem znaków.
+- `sortBy` (opcjonalny): Kolumna do sortowanie wyników. Dozwolone wartości: 'id', 'external_id', 'name'.
+- `sortDirection` (opcjonalny): Kierunek sortowania wyników. Dozwolone wartości: 'asc', 'desc'.
+- `column` (opcjonalny): Kolumny do zwrócenia. Musi być ciągiem znaków. Dozwolone kolumny ('id','external_id','name')
 - `filters` (opcjonalny): Tablica filtrów do zastosowania. Może zawierać następujące pola:
     - `filters.name`: Filtr na podstawie nazwy gatunku. Musi być ciągiem znaków.
     - `filters.external_id`: Filtr na podstawie zewnętrznego identyfikatora TMDB. Musi być ciągiem znaków.
@@ -41,7 +43,7 @@ API obsługuje następujące języki dla parametrów `language` i `api_language`
 
 #### Przykład
 ```sh
-"https://example.com/api/genres?perPage=10&columns=name,external_id&filters[name]=comedy&api_language=pl&language=en,pl"
+"https://example.com/api/genres?perPage=10&columns=name,external_id&filters[name]=comedy&sortBy=name&sortDirection=desc&api_language=pl&language=en,pl"
 ```
 ### `GET /api/genres/{genreId}` - zwraca gatunek
 
@@ -62,7 +64,9 @@ API obsługuje następujące języki dla parametrów `language` i `api_language`
 
 - `perPage` (opcjonalny): Liczba wyników na stronę. Musi być liczbą całkowitą i większą od 0.
 - `page` (opcjonalny): Numer strony. Musi być liczbą i większą od 0.
-- `column` (opcjonalny): Kolumny do zwrócenia. Musi być ciągiem znaków.
+- `sortBy` (opcjonalny): Kolumna do sortowania wyników. Dozwolone wartości: 'id', 'title', 'external_id', 'vote_average', 'vote_count', 'popularity', 'release_date'.
+- `sortDirection` (opcjonalny): Kierunek sortowania wyników. Dozwolone wartości: 'asc', 'desc'.
+- `column` (opcjonalny): Kolumny do zwrócenia. Musi być ciągiem znaków.Dozwolone kolumny: 'id', 'title', 'external_id', 'vote_average', 'vote_count', 'popularity', 'release_date'.
 - `filters` (opcjonalny): Tablica filtrów do zastosowania. Może zawierać następujące pola:
     - `filters.title`: Filtr na podstawie tytułu. Musi być ciągiem znaków.
     - `filters.external_id`: Filtr na podstawie zewnętrznego identyfikatora. Musi być ciągiem znaków.
@@ -81,7 +85,7 @@ API obsługuje następujące języki dla parametrów `language` i `api_language`
 #### Przykład
 
 ```sh
-"https://example.com/api/movies?perPage=10&columns=title,external_id&filters[title]=Inception&filters[genre_id]=1,2&filters[from_release_date]=01-01-2023&filters[to_release_date]=31-12-2024&api_language=pl&language=en,pl"
+"https://example.com/api/movies?perPage=10&columns=title,external_id&filters[title]=Inception&filters[genre_id]=1,2&filters[from_release_date]=01-01-2023&filters[to_release_date]=31-12-2024&sortBy=title&sortDirection=desc&api_language=pl&language=en,pl"
 ```
 ### `GET /api/movies/{movieId}` - zwraca film
 
@@ -102,7 +106,9 @@ API obsługuje następujące języki dla parametrów `language` i `api_language`
 
 - `perPage` (opcjonalny): Liczba wyników na stronę. Musi być liczbą całkowitą i większą od 0.
 - `page` (opcjonalny): Numer strony. Musi być liczbą i większą od 0.
-- `column` (opcjonalny): Kolumny do zwrócenia. Musi być ciągiem znaków.
+- `sortBy` (opcjonalny): Kolumna do sortowania wyników. Dozwolone wartości: 'id', 'title', 'external_id', 'vote_average', 'vote_count', 'popularity'.
+- `sortDirection` (opcjonalny): Kierunek sortowania wyników. Dozwolone wartości: 'asc', 'desc'.
+- `column` (opcjonalny): Kolumny do zwrócenia. Musi być ciągiem znaków.Dozwolone kolumny: 'id', 'title', 'external_id', 'vote_average', 'vote_count', 'popularity'.
 - `filters` (opcjonalny): Tablica filtrów do zastosowania. Może zawierać następujące pola:
     - `filters.title`: Filtr na podstawie tytułu. Musi być ciągiem znaków.
     - `filters.external_id`: Filtr na podstawie zewnętrznego identyfikatora. Musi być ciągiem znaków.
@@ -119,7 +125,7 @@ API obsługuje następujące języki dla parametrów `language` i `api_language`
 #### Przykład użycia
 
 ```sh
-"https://example.com/api/series?perPage=10&columns=title,external_id&filters[title]=Inception&filters[genre_id]=1,2&api_language=pl&language=en,pl"
+"https://example.com/api/series?perPage=10&columns=title,external_id&filters[title]=Inception&filters[genre_id]=1,2&sortBy=title&sortDirection=desc&api_language=pl&language=en,pl"
 ```
 ### `GET /api/series/{serieId}` - zwraca serial
 

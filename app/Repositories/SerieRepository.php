@@ -18,7 +18,13 @@ class SerieRepository extends Repository
         $this->genreRepository = $genreRepository;
     }
 
-    public function paginate(int $perPage = 15, array $filters = [], array $columns = ['*'], array $languages = []): LengthAwarePaginator
+    public function paginate(
+        int    $perPage = 15,
+        array  $filters = [],
+        array  $columns = ['*'],
+        array  $languages = [],
+        string $sortBy = 'title',
+        string $sortDirection = 'asc'): LengthAwarePaginator
     {
         $query = $this->model::query();
 
@@ -66,6 +72,14 @@ class SerieRepository extends Repository
 
         if ($toPopularity = Arr::get($filters, 'to_popularity')) {
             $query = $query->where('popularity', '<=', $toPopularity);
+        }
+
+        if ($sortBy === 'title' && in_array($sortDirection, ['asc', 'desc'])) {
+            if (isset($languages[0])) {
+                $query = $query->orderByRaw("JSON_UNQUOTE(JSON_EXTRACT(title, '$.{$languages[0]}')) {$sortDirection}");
+            }
+        } elseif (in_array($sortDirection, ['asc', 'desc'])) {
+            $query = $query->orderBy($sortBy, $sortDirection);
         }
 
         $pagination = $query->paginate($perPage, $columns);

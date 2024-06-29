@@ -20,7 +20,13 @@ class MovieRepository extends Repository
         $this->genreRepository = $genreRepository;
     }
 
-    public function paginate(int $perPage = 15, array $filters = [], array $columns = ['*'], array $languages = []): LengthAwarePaginator
+    public function paginate(
+        int    $perPage = 15,
+        array  $filters = [],
+        array  $columns = ['*'],
+        array  $languages = [''],
+        string $sortBy = 'title',
+        string $sortDirection = 'asc'): LengthAwarePaginator
     {
         $query = $this->model::query();
 
@@ -80,6 +86,14 @@ class MovieRepository extends Repository
             $toReleaseDate = Carbon::parse($toReleaseDate)->format('Y-m-d');
 
             $query = $query->whereDate('release_date', '<=', $toReleaseDate);
+        }
+
+        if ($sortBy === 'title' && in_array($sortDirection, ['asc', 'desc'])) {
+            if (isset($languages[0])) {
+                $query = $query->orderByRaw("JSON_UNQUOTE(JSON_EXTRACT(title, '$.{$languages[0]}')) {$sortDirection}");
+            }
+        } elseif (in_array($sortDirection, ['asc', 'desc'])) {
+            $query = $query->orderBy($sortBy, $sortDirection);
         }
 
         $pagination = $query->paginate($perPage, $columns);

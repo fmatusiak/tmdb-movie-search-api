@@ -14,7 +14,13 @@ class GenreRepository extends Repository
         parent::__construct($genre);
     }
 
-    public function paginate(int $perPage = 15, array $filters = [], array $columns = ['*'], array $languages = []): LengthAwarePaginator
+    public function paginate(
+        int    $perPage = 15,
+        array  $filters = [],
+        array  $columns = ['*'],
+        array  $languages = [],
+        string $sortBy = 'name',
+        string $sortDirection = 'asc'): LengthAwarePaginator
     {
         $query = $this->model::query();
 
@@ -30,6 +36,14 @@ class GenreRepository extends Repository
             $externalIds = explode(',', $externalId);
 
             $query = $query->where('external_id', $externalIds);
+        }
+
+        if ($sortBy === 'name' && in_array($sortDirection, ['asc', 'desc'])) {
+            if (isset($languages[0])) {
+                $query = $query->orderByRaw("JSON_UNQUOTE(JSON_EXTRACT(name, '$.{$languages[0]}')) {$sortDirection}");
+            }
+        } elseif (in_array($sortDirection, ['asc', 'desc'])) {
+            $query = $query->orderBy($sortBy, $sortDirection);
         }
 
         $pagination = $query->paginate($perPage, $columns);

@@ -13,6 +13,7 @@ use Illuminate\Console\Command;
 use Illuminate\Contracts\Console\Isolatable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class TMDBFetchContent extends Command implements Isolatable
 {
@@ -64,6 +65,10 @@ class TMDBFetchContent extends Command implements Isolatable
      */
     public function handle(): void
     {
+        if (!$this->validateOptions()) {
+            return;
+        }
+
         $this->info("Starting to fetch content from TMDB");
 
         $this->fetchAndSaveContent();
@@ -71,14 +76,37 @@ class TMDBFetchContent extends Command implements Isolatable
         $this->info("Finished fetching content from TMDB");
     }
 
+    private function validateOptions(): bool
+    {
+        $moviesCount = $this->option('movies');
+        $seriesCount = $this->option('series');
+
+        $validator = Validator::make([
+            'movies' => $moviesCount,
+            'series' => $seriesCount,
+        ], [
+            'movies' => 'integer|min:1',
+            'series' => 'integer|min:1',
+        ]);
+
+        if ($validator->fails()) {
+            $messages = $validator->messages();
+            foreach ($messages->all() as $message) {
+                $this->error($message);
+            }
+            return false;
+        }
+        return true;
+    }
+
     private function fetchAndSaveContent(): void
     {
+        $moviesCount = $this->option('movies');
+        $seriesCount = $this->option('series');
+
         $this->fetchAndSaveGenres(TMDBApiLanguage::English);
         $this->fetchAndSaveGenres(TMDBApiLanguage::Polish);
         $this->fetchAndSaveGenres(TMDBApiLanguage::Deutsch);
-
-        $moviesCount = $this->option('movies');
-        $seriesCount = $this->option('series');
 
         $this->fetchAndSaveTopRatedMovies(TMDBApiLanguage::English, $moviesCount);
         $this->fetchAndSaveTopRatedSeries(TMDBApiLanguage::English, $seriesCount);

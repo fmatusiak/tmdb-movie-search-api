@@ -31,6 +31,7 @@ API obsługuje następujące języki dla parametrów `language` i `api_language`
 #### Parametry
 
 - `perPage` (opcjonalny): Liczba wyników na stronę. Musi być liczbą i większą od 0.
+- `page` (opcjonalny): Numer strony. Musi być liczbą i większą od 0.
 - `column` (opcjonalny): Kolumny do zwrócenia. Musi być ciągiem znaków.
 - `filters` (opcjonalny): Tablica filtrów do zastosowania. Może zawierać następujące pola:
     - `filters.name`: Filtr na podstawie nazwy gatunku. Musi być ciągiem znaków.
@@ -60,6 +61,7 @@ API obsługuje następujące języki dla parametrów `language` i `api_language`
 #### Parametry
 
 - `perPage` (opcjonalny): Liczba wyników na stronę. Musi być liczbą całkowitą i większą od 0.
+- `page` (opcjonalny): Numer strony. Musi być liczbą i większą od 0.
 - `column` (opcjonalny): Kolumny do zwrócenia. Musi być ciągiem znaków.
 - `filters` (opcjonalny): Tablica filtrów do zastosowania. Może zawierać następujące pola:
     - `filters.title`: Filtr na podstawie tytułu. Musi być ciągiem znaków.
@@ -99,6 +101,7 @@ API obsługuje następujące języki dla parametrów `language` i `api_language`
 #### Parametry
 
 - `perPage` (opcjonalny): Liczba wyników na stronę. Musi być liczbą całkowitą i większą od 0.
+- `page` (opcjonalny): Numer strony. Musi być liczbą i większą od 0.
 - `column` (opcjonalny): Kolumny do zwrócenia. Musi być ciągiem znaków.
 - `filters` (opcjonalny): Tablica filtrów do zastosowania. Może zawierać następujące pola:
     - `filters.title`: Filtr na podstawie tytułu. Musi być ciągiem znaków.
